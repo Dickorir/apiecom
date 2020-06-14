@@ -19,9 +19,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('register', 'API\RegisterController@register');
-Route::post('login', 'API\RegisterController@login');
-
-Route::apiResource('/products','ProductController');
+Route::post('login', 'API\RegisterController@login')->name('login');
+Route::middleware('auth:api')->group(function() {
+    Route::apiResource('/products', 'ProductController');
+});
 
 Route::group(['prefix' => 'products'],function(){
 

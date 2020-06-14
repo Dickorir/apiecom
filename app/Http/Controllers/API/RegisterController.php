@@ -39,6 +39,9 @@ class RegisterController extends BaseController
             'password' => $request->password
 
         ];
+//        if (!auth()->attempt($credentials)) {
+//            return response(['message' => 'Invalid Credentials']);
+//        }
         if( auth()->attempt($credentials) ){
             $user = Auth::user();
             $success['token'] =  $user->createToken('MyApp')-> accessToken;
