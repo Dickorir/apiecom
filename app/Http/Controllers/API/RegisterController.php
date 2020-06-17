@@ -45,12 +45,19 @@ class RegisterController extends BaseController
         if( auth()->attempt($credentials) ){
             $user = Auth::user();
             $success['token'] =  $user->createToken('MyApp')-> accessToken;
-            $success['name'] =  $user->name;
+            $success['user'] =  $user;
 
             return $this->sendResponse($success, 'User login successfully.');
         }
         else{
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
         }
+    }
+
+    public function logout (Request $request) {
+        $token = $request->user()->token();
+        $token->revoke();
+        $response = ['message' => 'You have been successfully logged out!'];
+        return response($response, 200);
     }
 }

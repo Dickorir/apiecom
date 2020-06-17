@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
@@ -25,15 +26,17 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        $product = new Product;
-        $product->name = $request->name;
-        $product->detail = $request->description;
-        $product->price = $request->price;
-        $product->stock = $request->stock;
-        $product->discount = $request->discount;
+        $validated=Validator::make($request->json()->all(),[
+            'name' => 'required',
+            'detail' => 'required',
+            'price' => 'required',
+            'stock' => 'required',
+            'discount' => 'required',
+            'user_id' => 'required',
+        ]);
+        $data=$validated->validated();
 
-        $product->save();
-
+        $product=Product::create($data);
         return response([
 
             'data' => new ProductResource($product)
@@ -49,13 +52,23 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $this->userAuthorize($product);
+        $validated=Validator::make($request->json()->all(),[
+            'name' => 'required',
+            'detail' => 'required',
+            'price' => 'required',
+            'stock' => 'required',
+            'discount' => 'required',
+            'user_id' => 'required',
+        ]);
+        $data=$validated->validated();
 
-        $request['detail'] = $request->description;
+//        $this->userAuthorize($product);
 
-        unset($request['description']);
+//        $request['detail'] = $request->description;
 
-        $product->update($request->all());
+//        unset($request['description']);
+
+        $product->update($data);
 
         return response([
 
@@ -76,7 +89,8 @@ class ProductController extends Controller
     {
         if(Auth::user()->id != $product->user_id){
             //throw your exception text here;
-
+            return response('Unauthorized',Response::HTTP_UNAUTHORIZED);
         }
     }
+
 }
